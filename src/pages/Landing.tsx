@@ -505,7 +505,7 @@ export default function Landing({ onNavigate }: LandingProps) {
 
       {/* WhatsApp FAB */}
       <a
-        href="https://wa.me/243000000000"
+        href="https://wa.me/242069254550"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-green-500 hover:bg-green-400 flex items-center justify-center shadow-xl shadow-green-900/40 transition-all hover:-translate-y-1 z-40"
