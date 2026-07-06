@@ -12,14 +12,14 @@
   command = "npm run dev"
   port = 5173
 
-[[context.production.environment]]
+[context.production.environment]
   VITE_SUPABASE_URL = ""
   VITE_SUPABASE_ANON_KEY = ""
 
-[[context.preview.environment]]
+[context.preview.environment]
   VITE_SUPABASE_URL = ""
   VITE_SUPABASE_ANON_KEY = ""
 
-[[context.branch-deploy.environment]]
+[context.branch-deploy.environment]
   VITE_SUPABASE_URL = ""
   VITE_SUPABASE_ANON_KEY = ""
