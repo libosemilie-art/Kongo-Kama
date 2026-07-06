@@ -25,11 +25,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchProfile = async (userId: string, userEmail?: string, userMeta?: Record<string, unknown>, retryCount = 0) => {
     setProfileLoading(true);
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
 
     if (error) {
       if (retryCount < 2) {
@@ -65,8 +66,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    setProfile(data as Profile);
-    setProfileLoading(false);
+      setProfile(data as Profile);
+      setProfileLoading(false);
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+      setProfile(null);
+      setProfileLoading(false);
+    }
   };
 
   const refreshProfile = async () => {
@@ -74,69 +80,91 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id, session.user.email, session.user.user_metadata);
-      } else {
-        setProfileLoading(false);
+    try {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchProfile(session.user.id, session.user.email, session.user.user_metadata);
+        } else {
+          setProfileLoading(false);
+          setLoading(false);
+        }
         setLoading(false);
-      }
-      setLoading(false);
-    });
+      }).catch((err) => {
+        console.error('Error getting session:', err);
+        setLoading(false);
+      });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        (async () => { await fetchProfile(session.user.id, session.user.email, session.user.user_metadata); })();
-      } else {
-        setProfile(null);
-        setProfileLoading(false);
-      }
-      setLoading(false);
-    });
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          (async () => { await fetchProfile(session.user.id, session.user.email, session.user.user_metadata); })();
+        } else {
+          setProfile(null);
+          setProfileLoading(false);
+        }
+        setLoading(false);
+      });
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    } catch (err) {
+      console.error('Auth setup error:', err);
+      setLoading(false);
+    }
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName } },
-    });
-    if (error) return { error };
-    // Profile is auto-created by database trigger (handle_new_user)
-    // Fallback: if trigger didn't create it, try client-side insert
-    if (data.user) {
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', data.user.id)
-        .maybeSingle();
-      if (!existingProfile) {
-        await supabase.from('profiles').insert({
-          id: data.user.id,
-          email,
-          full_name: fullName,
-          role: 'student',
-        });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName } },
+      });
+      if (error) return { error };
+      // Profile is auto-created by database trigger (handle_new_user)
+      // Fallback: if trigger didn't create it, try client-side insert
+      if (data.user) {
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', data.user.id)
+          .maybeSingle();
+        if (!existingProfile) {
+          await supabase.from('profiles').insert({
+            id: data.user.id,
+            email,
+            full_name: fullName,
+            role: 'student',
+          });
+        }
       }
+      return { error: null };
+    } catch (err) {
+      console.error('Sign up error:', err);
+      return { error: err as Error };
     }
-    return { error: null };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error ?? null };
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error: error ?? null };
+    } catch (err) {
+      console.error('Sign in error:', err);
+      return { error: err as Error };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setProfile(null);
-    setProfileLoading(true);
+    try {
+      await supabase.auth.signOut();
+      setProfile(null);
+      setProfileLoading(true);
+    } catch (err) {
+      console.error('Sign out error:', err);
+    }
   };
 
   return (
