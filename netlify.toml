@@ -13,13 +13,13 @@
   port = 5173
 
 [context.production.environment]
-  VITE_SUPABASE_URL = ""
-  VITE_SUPABASE_ANON_KEY = ""
+  VITE_SUPABASE_URL = "https://vczijhkykcynlwnwxwmo.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjemlqaGt5a2N5bmx3bnd4d21vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMzc4ODAsImV4cCI6MjA5ODkxMzg4MH0.Kxc1Ma0-SNS48fR2NsYXB-w1KQqYXfZeWS1HDpNZYrM"
 
-[context.preview.environment]
-  VITE_SUPABASE_URL = ""
-  VITE_SUPABASE_ANON_KEY = ""
+[context.deploy-preview.environment]
+  VITE_SUPABASE_URL = "https://vczijhkykcynlwnwxwmo.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjemlqaGt5a2N5bmx3bnd4d21vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMzc4ODAsImV4cCI6MjA5ODkxMzg4MH0.Kxc1Ma0-SNS48fR2NsYXB-w1KQqYXfZeWS1HDpNZYrM"
 
 [context.branch-deploy.environment]
-  VITE_SUPABASE_URL = ""
-  VITE_SUPABASE_ANON_KEY = ""
+  VITE_SUPABASE_URL = "https://vczijhkykcynlwnwxwmo.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjemlqaGt5a2N5bmx3bnd4d21vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMzc4ODAsImV4cCI6MjA5ODkxMzg4MH0.Kxc1Ma0-SNS48fR2NsYXB-w1KQqYXfZeWS1HDpNZYrM"
