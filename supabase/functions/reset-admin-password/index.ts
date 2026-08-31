@@ -20,9 +20,16 @@ Deno.serve(async (req: Request) => {
     );
 
     const adminEmail = "kongokama0@gmail.com";
-    const adminPassword = "KongoKama###";
+    const adminPassword = Deno.env.get("ADMIN_PASSWORD");
     const adminFullName = "Mbuta Sita Toma";
     const adminId = "f858eb72-b295-4981-8611-6113e5701047";
+
+    if (!adminPassword) {
+      return new Response(JSON.stringify({ error: "ADMIN_PASSWORD secret is not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Update the existing admin user's password
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(

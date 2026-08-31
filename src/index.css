@@ -20,12 +20,16 @@
   }
 
   body {
-    @apply bg-stone-950 text-stone-100;
+    @apply bg-stone-50 text-stone-900;
     overscroll-behavior: none;
   }
 
   .dark body {
     @apply bg-stone-950 text-stone-100;
+  }
+
+  input, textarea, select, button {
+    font: inherit;
   }
 }
 

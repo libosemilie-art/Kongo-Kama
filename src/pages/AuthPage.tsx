@@ -19,10 +19,12 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
@@ -41,6 +43,8 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
         const { error } = await signUp(email, password, fullName);
         if (error) {
           setError('Erreur lors de l\'inscription. Cet email est peut-être déjà utilisé.');
+        } else {
+          setSuccess('Compte créé. Vérifiez votre adresse email pour confirmer votre inscription, puis connectez-vous.');
         }
         // Navigation handled by App.tsx useEffect based on profile.role
       }
@@ -199,6 +203,12 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
             {error && (
               <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
                 {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-sm leading-relaxed">
+                {success}
               </div>
             )}
 

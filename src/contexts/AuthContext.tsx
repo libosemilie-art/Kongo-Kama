@@ -120,9 +120,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName } },
+        options: {
+          data: { full_name: fullName },
+          emailRedirectTo: window.location.origin,
+        },
       });
       if (error) return { error };
+      if (data.user && data.user.identities?.length === 0) {
+        return { error: new Error('Cette adresse email est déjà utilisée.') };
+      }
       // Profile is auto-created by database trigger (handle_new_user)
       // Fallback: if trigger didn't create it, try client-side insert
       if (data.user) {
@@ -132,12 +138,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .eq('id', data.user.id)
           .maybeSingle();
         if (!existingProfile) {
-          await supabase.from('profiles').insert({
+          const { error: profileError } = await supabase.from('profiles').insert({
             id: data.user.id,
             email,
             full_name: fullName,
             role: 'student',
           });
+          if (profileError && profileError.code !== '23505') return { error: profileError };
         }
       }
       return { error: null };
