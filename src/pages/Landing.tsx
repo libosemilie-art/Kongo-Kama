@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { BookOpen, Flame, Star, ChevronRight, MessageCircle, Scroll, Globe, Heart, ArrowRight, Phone } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { BookOpen, Flame, ChevronRight, MessageCircle, Scroll, Globe, Heart, ArrowRight, Phone, Facebook, Instagram, Youtube, ChevronUp } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface LandingProps {
@@ -40,8 +40,21 @@ function KongoSymbol({ size = 48, className = '' }: { size?: number; className?:
 export default function Landing({ onNavigate }: LandingProps) {
   const { theme } = useTheme();
   const heroRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const isDark = theme === 'dark';
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const courses = [
     {
@@ -76,7 +89,7 @@ export default function Landing({ onNavigate }: LandingProps) {
       {/* HERO */}
       <section
         ref={heroRef}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
+        className="relative min-h-[min(760px,92vh)] flex items-center justify-center overflow-hidden pt-20 pb-16"
       >
         <div className={`absolute inset-0 ${isDark ? 'bg-stone-950' : 'bg-amber-50'}`} />
         <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-stone-900/40" />
@@ -85,7 +98,7 @@ export default function Landing({ onNavigate }: LandingProps) {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-amber-700/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 text-xs font-semibold uppercase tracking-widest mb-8">
             <KongoSymbol size={16} className="text-amber-400" />
             Ecole d'Eveil de Conscience
@@ -102,7 +115,11 @@ export default function Landing({ onNavigate }: LandingProps) {
             <div className="h-px w-16 bg-amber-500/40" />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <p className={`max-w-2xl mx-auto text-base sm:text-lg leading-relaxed mb-8 ${isDark ? 'text-stone-400' : 'text-stone-600'}`}>
+            Apprenez le Kikongo et découvrez la spiritualité Kongo à votre rythme, depuis votre téléphone.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => onNavigate('register')}
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-white font-semibold text-base transition-all duration-200 shadow-xl shadow-amber-900/30 hover:shadow-amber-900/50 hover:-translate-y-0.5"
@@ -122,7 +139,7 @@ export default function Landing({ onNavigate }: LandingProps) {
             </button>
           </div>
 
-          <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+          <div className={`mt-12 grid grid-cols-3 gap-3 sm:gap-8 max-w-lg mx-auto rounded-2xl border p-4 sm:p-5 ${isDark ? 'bg-stone-900/60 border-stone-800' : 'bg-white/70 border-amber-100'}`}>
             {[
               { value: '2', label: 'Divisions' },
               { value: '4', label: 'Cours' },
@@ -481,24 +498,68 @@ export default function Landing({ onNavigate }: LandingProps) {
       </section>
 
       {/* FOOTER */}
-      <footer className={`py-12 px-4 border-t ${isDark ? 'bg-stone-950 border-stone-900' : 'bg-stone-900 border-stone-800'}`}>
+      <footer className={`py-16 px-4 border-t ${isDark ? 'bg-stone-950 border-stone-900' : 'bg-stone-900 border-stone-800'}`}>
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center">
-                <Flame className="w-4 h-4 text-white" />
+          <div className="grid sm:grid-cols-3 gap-10 mb-10">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-9 h-9 rounded-lg object-cover" />
+                <span className="font-bold text-lg text-amber-50">
+                  Kongo<span className="text-amber-500">Kama</span>.com
+                </span>
               </div>
-              <span className="font-bold text-amber-50">
-                Kongo<span className="text-amber-500">Kama</span>.com
-              </span>
+              <p className={`text-sm leading-relaxed ${isDark ? 'text-stone-400' : 'text-stone-500'}`}>
+                Ecole d'Eveil de Conscience. Enseignement de la Kongologie, langue Kikongo et spiritualité ancestrale.
+              </p>
             </div>
-            <div className="flex items-center gap-6">
-              <button onClick={() => onNavigate('login')} className="text-sm text-stone-400 hover:text-amber-400 transition-colors">Connexion</button>
-              <button onClick={() => onNavigate('register')} className="text-sm text-stone-400 hover:text-amber-400 transition-colors">S'inscrire</button>
+
+            {/* Navigation */}
+            <div>
+              <h4 className="text-sm font-bold text-amber-50 mb-4 uppercase tracking-wider">Navigation</h4>
+              <ul className="space-y-2">
+                <li><button onClick={() => onNavigate('home')} className={`text-sm transition-colors ${isDark ? 'text-stone-400 hover:text-amber-400' : 'text-stone-500 hover:text-amber-400'}`}>Accueil</button></li>
+                <li><button onClick={() => onNavigate('home#kinkimba')} className={`text-sm transition-colors ${isDark ? 'text-stone-400 hover:text-amber-400' : 'text-stone-500 hover:text-amber-400'}`}>Académie Kinkimba</button></li>
+                <li><button onClick={() => onNavigate('home#nzila')} className={`text-sm transition-colors ${isDark ? 'text-stone-400 hover:text-amber-400' : 'text-stone-500 hover:text-amber-400'}`}>Temple Nzila Kongo</button></li>
+                <li><button onClick={() => onNavigate('store')} className={`text-sm transition-colors ${isDark ? 'text-stone-400 hover:text-amber-400' : 'text-stone-500 hover:text-amber-400'}`}>Boutique Digitale</button></li>
+              </ul>
             </div>
+
+            {/* Social & Contact */}
+            <div>
+              <h4 className="text-sm font-bold text-amber-50 mb-4 uppercase tracking-wider">Réseaux Sociaux</h4>
+              <div className="flex flex-wrap gap-3 mb-4">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-blue-600 hover:bg-blue-500 flex items-center justify-center text-white transition-all hover:-translate-y-0.5 shadow-lg shadow-blue-900/20">
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 flex items-center justify-center text-white transition-all hover:-translate-y-0.5 shadow-lg shadow-pink-900/20">
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-red-600 hover:bg-red-500 flex items-center justify-center text-white transition-all hover:-translate-y-0.5 shadow-lg shadow-red-900/20">
+                  <Youtube className="w-5 h-5" />
+                </a>
+                <a href="https://www.tiktok.com/@kongokama0" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-stone-800 hover:bg-stone-700 flex items-center justify-center text-white transition-all hover:-translate-y-0.5 shadow-lg shadow-stone-900/20">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>
+                </a>
+              </div>
+              <a href="https://wa.me/242069254550" target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${isDark ? 'text-green-400 hover:text-green-300' : 'text-green-500 hover:text-green-400'}`}>
+                <MessageCircle className="w-4 h-4" />
+                Support WhatsApp
+              </a>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className={`pt-8 border-t ${isDark ? 'border-stone-800' : 'border-stone-800'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
             <p className="text-xs text-stone-600">
-              2024 KongoKama.com — Kongologie par Mbuta Sita Toma
+              © 2026 KongoKama.com — Kongologie par Mbuta Sita Toma
             </p>
+            <div className="flex items-center gap-6">
+              <button onClick={() => onNavigate('legal')} className="text-xs text-stone-500 hover:text-amber-400 transition-colors">Mentions Légales</button>
+              <button onClick={() => onNavigate('privacy')} className="text-xs text-stone-500 hover:text-amber-400 transition-colors">Confidentialité</button>
+              <button onClick={() => onNavigate('login')} className="text-xs text-stone-500 hover:text-amber-400 transition-colors">Connexion</button>
+              <button onClick={() => onNavigate('register')} className="text-xs text-stone-500 hover:text-amber-400 transition-colors">S'inscrire</button>
+            </div>
           </div>
         </div>
       </footer>
@@ -512,6 +573,17 @@ export default function Landing({ onNavigate }: LandingProps) {
       >
         <MessageCircle className="w-6 h-6 text-white" />
       </a>
+
+      {/* Scroll to top button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 left-6 w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-400 flex items-center justify-center shadow-xl shadow-amber-900/30 transition-all hover:-translate-y-1 z-40 text-white"
+          aria-label="Retour en haut"
+        >
+          <ChevronUp className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 }

@@ -18,6 +18,7 @@ export default function Navbar({ onNavigate, currentPage }: NavbarProps) {
     { label: 'Kinkimba', page: 'home#kinkimba' },
     { label: 'Nzila Kongo', page: 'home#nzila' },
     { label: 'Cours', page: 'home#courses' },
+    { label: 'Boutique', page: 'store' },
   ];
 
   const handleNav = (page: string) => {
@@ -35,7 +36,7 @@ export default function Navbar({ onNavigate, currentPage }: NavbarProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <button onClick={() => handleNav('home')} className="flex items-center gap-2.5 group">
-            <img src="/logo.svg" alt="KongoKama" className="w-8 h-8 rounded-lg object-cover" />
+            <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-8 h-8 rounded-lg object-cover" />
             <span className={`font-bold text-lg tracking-tight ${theme === 'dark' ? 'text-amber-50' : 'text-stone-900'}`}>
               Kongo<span className="text-amber-500">Kama</span>
             </span>

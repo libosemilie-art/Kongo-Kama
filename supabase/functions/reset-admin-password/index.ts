@@ -19,13 +19,13 @@ Deno.serve(async (req: Request) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    const adminEmail = "mbutasita@kongokama.com";
+    const adminEmail = "kongokama0@gmail.com";
     const adminPassword = "KongoKama###";
     const adminFullName = "Mbuta Sita Toma";
     const adminId = "f858eb72-b295-4981-8611-6113e5701047";
 
     // Update the existing admin user's password
-    const { data: updateData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
       adminId,
       {
         password: adminPassword,

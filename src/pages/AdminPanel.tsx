@@ -98,7 +98,9 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
   const [actionError, setActionError] = useState('');
   const notifPanelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { loadAll(); }, []);
+  useEffect(() => {
+    if (profile?.id) void loadAll();
+  }, [profile?.id]);
 
   useEffect(() => {
     if (!profile) return;
@@ -123,6 +125,7 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
   };
 
   const loadAll = async () => {
+    if (!profile?.id || profile.role !== 'admin') return;
     setLoading(true);
     const [courseRes, studentRes, classRes, paymentRes, approvalRes] = await Promise.all([
       supabase.from('courses').select('*').order('order_index'),
@@ -270,7 +273,7 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
         `}>
           {/* Logo */}
           <div className={`flex items-center gap-3 px-5 h-16 border-b ${isDark ? 'border-stone-800' : 'border-stone-100'}`}>
-            <img src="/logo.svg" alt="KongoKama" className="w-8 h-8 rounded-xl object-cover" />
+            <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-8 h-8 rounded-xl object-cover" />
             <div>
               <span className={`font-bold text-sm ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
                 Kongo<span className="text-amber-500">Kama</span>

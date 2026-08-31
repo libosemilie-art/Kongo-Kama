@@ -7,6 +7,9 @@ import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
 import ClassPage from './pages/ClassPage';
+import DigitalStore from './pages/DigitalStore';
+import LegalMentions from './pages/LegalMentions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 type Page = string;
 
@@ -91,6 +94,33 @@ function AppContent() {
 
   if (page === 'login' || page === 'register') {
     return <AuthPage mode={page} onNavigate={navigate} />;
+  }
+
+  if (page === 'store') {
+    return (
+      <div>
+        <Navbar onNavigate={navigate} currentPage={page} />
+        <DigitalStore onNavigate={navigate} />
+      </div>
+    );
+  }
+
+  if (page === 'legal') {
+    return (
+      <div>
+        <Navbar onNavigate={navigate} currentPage={page} />
+        <LegalMentions onNavigate={navigate} />
+      </div>
+    );
+  }
+
+  if (page === 'privacy') {
+    return (
+      <div>
+        <Navbar onNavigate={navigate} currentPage={page} />
+        <PrivacyPolicy onNavigate={navigate} />
+      </div>
+    );
   }
 
   return (

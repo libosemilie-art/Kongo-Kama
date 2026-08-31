@@ -46,6 +46,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const isDark = theme === 'dark';
 
   const [tab, setTab] = useState<SideTab>('home');
+  const [courseSearch, setCourseSearch] = useState('');
   const [enrollments, setEnrollments] = useState<EnrollmentWithClass[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [allClasses, setAllClasses] = useState<Class[]>([]);
@@ -75,7 +76,9 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const [enrollResult, setEnrollResult] = useState<'idle' | 'success' | 'error' | 'approval_sent' | 'no_class'>('idle');
   const [enrollMessage, setEnrollMessage] = useState('');
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    if (profile?.id) void loadData();
+  }, [profile?.id]);
 
   useEffect(() => {
     if (!profile) return;
@@ -102,7 +105,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const loadData = async () => {
     setLoadingData(true);
     const [enrollRes, courseRes, classRes] = await Promise.all([
-      supabase.from('class_enrollments').select('*, classes(id, name, description, access_code, courses(*))').order('enrolled_at', { ascending: false }),
+      supabase.from('class_enrollments').select('*, classes(id, name, description, access_code, courses(*))').eq('student_id', profile?.id ?? '').order('enrolled_at', { ascending: false }),
       supabase.from('courses').select('*').order('order_index'),
       supabase.from('classes').select('*, courses(*)').eq('is_active', true).order('created_at', { ascending: false }),
     ]);
@@ -283,7 +286,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         `}>
           {/* Logo */}
           <div className={`flex items-center gap-3 px-5 h-16 border-b ${isDark ? 'border-stone-800' : 'border-stone-100'}`}>
-            <img src="/logo.svg" alt="KongoKama" className="w-8 h-8 rounded-xl object-cover" />
+            <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-8 h-8 rounded-xl object-cover" />
             <span className={`font-bold text-base ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
               Kongo<span className="text-amber-500">Kama</span>
             </span>
@@ -740,6 +743,17 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 <p className={`text-xs ${isDark ? 'text-stone-500' : 'text-stone-400'}`}>Inscrivez-vous directement ou utilisez un code d'accès fourni par votre professeur</p>
               </div>
 
+              <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${isDark ? 'bg-stone-900 border-stone-800' : 'bg-white border-stone-200'}`}>
+                <BookOpen className={`w-4 h-4 flex-shrink-0 ${isDark ? 'text-stone-500' : 'text-stone-400'}`} />
+                <input
+                  value={courseSearch}
+                  onChange={e => setCourseSearch(e.target.value)}
+                  placeholder="Rechercher un cours, une leçon..."
+                  className={`min-w-0 flex-1 bg-transparent text-sm outline-none ${isDark ? 'text-stone-100 placeholder-stone-600' : 'text-stone-800 placeholder-stone-400'}`}
+                  aria-label="Rechercher un cours"
+                />
+              </div>
+
               {/* Kinkimba */}
               <div>
                 <div className={`flex items-center gap-2 mb-3`}>
@@ -747,7 +761,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   <h3 className={`text-sm font-bold ${isDark ? 'text-stone-300' : 'text-stone-700'}`}>Academie — Kinkimba</h3>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {courses.filter(c => c.division === 'kinkimba').map(course => {
+                  {courses.filter(c => c.division === 'kinkimba' && `${c.title} ${c.description}`.toLowerCase().includes(courseSearch.toLowerCase())).map(course => {
                     const existing = getCourseEnrollmentStatus(course.id);
                     const hasClass = allClasses.some(c => c.course_id === course.id && c.is_active);
                     return (
@@ -819,7 +833,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   <h3 className={`text-sm font-bold ${isDark ? 'text-stone-300' : 'text-stone-700'}`}>Temple — Nzila Kongo</h3>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {courses.filter(c => c.division === 'nzila_kongo').map(course => {
+                  {courses.filter(c => c.division === 'nzila_kongo' && `${c.title} ${c.description}`.toLowerCase().includes(courseSearch.toLowerCase())).map(course => {
                     const existing = getCourseEnrollmentStatus(course.id);
                     const hasClass = allClasses.some(c => c.course_id === course.id && c.is_active);
                     return (

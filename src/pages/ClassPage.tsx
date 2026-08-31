@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, BookOpen, FileText, Image, Video, CheckCircle, MessageCircle, Send, Flame, Download, Plus, Trash2, CreditCard as Edit3, Music, Type, ChevronDown, ChevronRight, Users, Pin, Reply, X, ZoomIn, ZoomOut, Maximize2, Play, Pause, Volume2, Settings, MoreVertical, Smile, Eye, Clock, GripVertical, Hash, Paperclip, Link } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, Image, Video, CheckCircle, MessageCircle, Send, Flame, Download, Plus, Trash2, Music, Type, ChevronDown, Users, Pin, Reply, X, ZoomIn, ZoomOut, Maximize2, Play, Pause, Hash } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase, Module, ModuleItem, ItemProgress, ForumMessage, MessageReaction } from '../lib/supabase';
+import { supabase, Module, ModuleItem, ItemProgress, ForumMessage } from '../lib/supabase';
 
 interface ClassPageProps {
   classId: string;
@@ -78,7 +78,11 @@ function AudioPlayer({ url, title, isDark }: { url: string; title: string; isDar
 
   const toggle = () => {
     if (!audioRef.current) return;
-    playing ? audioRef.current.pause() : audioRef.current.play();
+    if (playing) {
+      audioRef.current.pause();
+    } else {
+      void audioRef.current.play();
+    }
     setPlaying(!playing);
   };
 
@@ -232,7 +236,7 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
       if (mods.length > 0) setExpandedModules(new Set([mods[0].id]));
     }
     if (progressRes.data) setItemProgress(progressRes.data as ItemProgress[]);
-    if (membersRes.data) setMembers(membersRes.data.map((e: { profiles: { full_name: string; email: string }; enrolled_at: string }) => ({ ...e.profiles, enrolled_at: e.enrolled_at })));
+    if (membersRes.data) setMembers(membersRes.data.map((e: { profiles: { full_name: string; email: string }[]; enrolled_at: string }) => ({ ...e.profiles[0], enrolled_at: e.enrolled_at })));
     if (messagesRes.data) {
       const msgs = messagesRes.data as unknown as ForumMessage[];
       setMessages(msgs);
@@ -244,7 +248,11 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
   const toggleModule = (id: string) => {
     setExpandedModules(prev => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };
@@ -613,8 +621,6 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
                     const sender = msg.profiles as unknown as { full_name: string; email: string; role: string };
                     const isOwn = msg.sender_id === profile?.id;
                     const isTeacher = sender?.role === 'admin';
-                    const replyMsg = replyTo?.id === msg.id;
-
                     return (
                       <div key={msg.id} className={`flex items-end gap-2 group ${isOwn ? 'flex-row-reverse' : ''}`}>
                         <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isTeacher ? 'bg-amber-500 text-white' : isDark ? 'bg-stone-700 text-stone-300' : 'bg-stone-200 text-stone-600'}`}>

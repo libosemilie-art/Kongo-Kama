@@ -8,18 +8,6 @@ interface AuthPageProps {
   onNavigate: (page: string) => void;
 }
 
-function KongoSymbol({ size = 48, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" className={className}>
-      <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="24" cy="24" r="4" fill="currentColor" />
-      <line x1="4" y1="24" x2="44" y2="24" stroke="currentColor" strokeWidth="1.5" />
-      <line x1="24" y1="4" x2="24" y2="44" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
 export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
   const { theme } = useTheme();
   const { signIn, signUp } = useAuth();
@@ -65,25 +53,41 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
     <div className={`min-h-screen flex ${isDark ? 'bg-stone-950' : 'bg-stone-50'}`}>
       {/* Left decorative panel */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <img
-          src="https://images.pexels.com/photos/3394656/pexels-photo-3394656.jpeg?auto=compress&cs=tinysrgb&w=1200"
-          alt="African heritage"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-stone-950/90 via-stone-950/70 to-amber-900/40" />
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-950 via-stone-900 to-amber-950" />
+        {/* Geometric Kongo pattern */}
+        <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="auth-kongo-pattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+              <circle cx="40" cy="40" r="30" fill="none" stroke="currentColor" strokeWidth="0.5" />
+              <circle cx="40" cy="40" r="20" fill="none" stroke="currentColor" strokeWidth="0.5" />
+              <circle cx="40" cy="40" r="10" fill="none" stroke="currentColor" strokeWidth="0.5" />
+              <line x1="10" y1="40" x2="70" y2="40" stroke="currentColor" strokeWidth="0.5" />
+              <line x1="40" y1="10" x2="40" y2="70" stroke="currentColor" strokeWidth="0.5" />
+              <line x1="18" y1="18" x2="62" y2="62" stroke="currentColor" strokeWidth="0.3" />
+              <line x1="62" y1="18" x2="18" y2="62" stroke="currentColor" strokeWidth="0.3" />
+            </pattern>
+          </defs>
+          <rect width="400" height="400" fill="url(#auth-kongo-pattern)" />
+        </svg>
+        {/* Glowing orbs */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-amber-700/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute inset-0 flex flex-col items-center justify-center p-12">
-          <KongoSymbol size={64} className="text-amber-400 mb-8" />
+          <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-20 h-20 rounded-2xl object-cover mb-8 drop-shadow-2xl" />
           <h1 className="text-4xl font-bold text-amber-50 text-center mb-4">
             Kongo<span className="text-amber-400">Kama</span>
           </h1>
-          <p className="text-stone-300 text-center text-base leading-relaxed max-w-xs">
+          <p className="text-stone-300 text-center text-base leading-relaxed max-w-xs mb-2">
             Entrez dans la voie de la connaissance ancestrale Kongo
           </p>
-          <div className="mt-8 space-y-4 w-full max-w-xs">
+          <p className="text-amber-400/70 text-center text-sm italic mb-8">
+            « Kukonga » — Rassembler pour protéger
+          </p>
+          <div className="space-y-4 w-full max-w-xs">
             {[
-              { label: 'Langue Kikongo', desc: 'Apprenez la langue sacrée' },
-              { label: 'Spiritualité Kongo', desc: 'Initiation ancestrale' },
-              { label: 'Philosophie Bukongo', desc: 'Kongologie profonde' },
+              { label: 'Langue Kikongo', desc: 'Apprenez la langue sacrée du Royaume Kongo' },
+              { label: 'Spiritualité Nzila Kongo', desc: 'La voie initiatique ancestrale' },
+              { label: 'Philosophie Bukongo', desc: 'La kongologie de Mbuta Sita Toma' },
             ].map(item => (
               <div key={item.label} className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
@@ -110,7 +114,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
 
           {/* Logo mobile */}
           <div className="flex items-center gap-2.5 mb-8 lg:hidden">
-            <img src="/logo.svg" alt="KongoKama" className="w-8 h-8 rounded-lg object-cover" />
+            <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-8 h-8 rounded-lg object-cover" />
             <span className={`font-bold text-lg ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
               Kongo<span className="text-amber-500">Kama</span>
             </span>
