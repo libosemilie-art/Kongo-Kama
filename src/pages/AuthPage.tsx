@@ -42,7 +42,16 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
         }
         const { error } = await signUp(email, password, fullName);
         if (error) {
-          setError('Erreur lors de l\'inscription. Cet email est peut-être déjà utilisé.');
+          const message = error.message.toLowerCase();
+          if (message.includes('already') || message.includes('déjà') || message.includes('already registered')) {
+            setError('Cette adresse email est déjà utilisée. Connectez-vous ou utilisez une autre adresse.');
+          } else if (message.includes('password')) {
+            setError('Le mot de passe doit contenir au moins 6 caractères.');
+          } else if (message.includes('email')) {
+            setError('Veuillez vérifier que votre adresse email est correcte.');
+          } else {
+            setError('Inscription impossible pour le moment. Vérifiez votre connexion puis réessayez.');
+          }
         } else {
           setSuccess('Compte créé. Vérifiez votre adresse email pour confirmer votre inscription, puis connectez-vous.');
         }
