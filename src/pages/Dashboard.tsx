@@ -233,7 +233,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     if (!paymentPhone || !paymentRef || !paymentAmount) return;
     setPaymentLoading(true);
     setPaymentError('');
-    const { error } = await supabase.from('payments').insert({ enrollment_id: selectedEnrollmentId, student_id: profile!.id, amount: parseFloat(paymentAmount), currency: 'USD', payment_method: paymentMethod, phone_number: paymentPhone, reference_code: paymentRef, status: 'submitted' });
+    const { error } = await supabase.from('payments').insert({ enrollment_id: selectedEnrollmentId, student_id: profile!.id, amount: parseFloat(paymentAmount), currency: 'XAF', payment_method: paymentMethod, phone_number: paymentPhone, reference_code: paymentRef, status: 'submitted' });
     if (!error) {
       // Database trigger (update_enrollment_on_payment) auto-updates enrollment status
       setPaymentResult('success'); await loadData();
@@ -454,7 +454,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
               {/* Hero greeting */}
               <div className={`relative rounded-3xl overflow-hidden p-8 ${isDark ? 'bg-stone-900' : 'bg-white'} border ${isDark ? 'border-stone-800' : 'border-stone-200'}`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/15 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute top-0 right-0 w-48 h-48 opacity-5 pointer-events-none">
                   <KongoSymbol size={192} className="text-amber-500" />
                 </div>
@@ -1017,10 +1017,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                     ))}
                   </div>
                   <div className={`p-3 rounded-xl text-center ${isDark ? 'bg-amber-950/30 border border-amber-800/30' : 'bg-amber-50 border border-amber-200'}`}>
-                    <p className={`text-xs mb-0.5 ${isDark ? 'text-stone-500' : 'text-stone-400'}`}>Envoyez au</p>
-                    <p className={`font-bold ${isDark ? 'text-stone-100' : 'text-stone-800'}`}>{paymentMethod === 'mtn_momo' ? '+243 XXX XXX XXX' : '+243 YYY YYY YYY'}</p>
+                    <p className={`text-xs mb-0.5 ${isDark ? 'text-stone-500' : 'text-stone-400'}`}>Envoyez au (Congo Brazzaville)</p>
+                    <p className={`font-bold ${isDark ? 'text-stone-100' : 'text-stone-800'}`}>{paymentMethod === 'mtn_momo' ? '+242 06 XXX XXXX' : '+242 05 XXX XXXX'}</p>
                   </div>
-                  {[{ label: 'Votre numero', value: paymentPhone, setter: setPaymentPhone, placeholder: '+243 000 000 000' }, { label: 'Reference de transaction', value: paymentRef, setter: setPaymentRef, placeholder: 'TXN123456789' }, { label: 'Montant (USD)', value: paymentAmount, setter: setPaymentAmount, placeholder: '25' }].map(f => (
+                  {[{ label: 'Votre numero', value: paymentPhone, setter: setPaymentPhone, placeholder: '+242 06 000 0000' }, { label: 'Reference de transaction', value: paymentRef, setter: setPaymentRef, placeholder: 'TXN123456789' }, { label: 'Montant (FCFA)', value: paymentAmount, setter: setPaymentAmount, placeholder: '15000' }].map(f => (
                     <div key={f.label}>
                       <label className={`block text-xs font-medium mb-1.5 ${isDark ? 'text-stone-400' : 'text-stone-600'}`}>{f.label}</label>
                       <input type="text" value={f.value} onChange={e => f.setter(e.target.value)} placeholder={f.placeholder} className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${isDark ? 'bg-stone-800 border-stone-700 text-stone-100 placeholder-stone-600' : 'bg-stone-50 border-stone-300 text-stone-900 placeholder-stone-400'}`} />

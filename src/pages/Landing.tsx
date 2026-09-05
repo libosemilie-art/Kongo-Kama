@@ -457,7 +457,7 @@ export default function Landing({ onNavigate }: LandingProps) {
               Paiement <span className="text-gold">Simple et Securise</span>
             </h2>
             <p className={`text-base ${isDark ? 'text-stone-400' : 'text-stone-500'}`}>
-              Nous acceptons les paiements Mobile Money africains
+              Nous acceptons les paiements Mobile Money au Congo Brazzaville
             </p>
           </Reveal>
 
@@ -538,7 +538,7 @@ export default function Landing({ onNavigate }: LandingProps) {
                 <ArrowRight className="w-4 h-4" />
               </button>
               <a
-                href="https://wa.me/243000000000"
+                href="https://wa.me/242069254550"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl border font-semibold transition-all hover:-translate-y-0.5 ${

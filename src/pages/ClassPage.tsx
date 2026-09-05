@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, BookOpen, FileText, Image, Video, CheckCircle, MessageCircle, Send, Flame, Download, Plus, Trash2, Music, Type, ChevronDown, Users, Pin, Reply, X, ZoomIn, ZoomOut, Maximize2, Play, Pause, Hash, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, Image, Video, CheckCircle, MessageCircle, Send, Flame, Download, Plus, Trash2, Music, Type, ChevronDown, Users, Pin, Reply, X, ZoomIn, ZoomOut, Maximize2, Play, Pause, Hash, Sun, Moon, Upload } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, Module, ModuleItem, ItemProgress, ForumMessage } from '../lib/supabase';
@@ -12,6 +12,24 @@ interface ClassPageProps {
 type MainView = 'content' | 'forum' | 'members';
 
 // ── Media Viewers ──────────────────────────────────────────────────────────────
+
+// Téléchargement réel d'un fichier cross-origin (Supabase Storage)
+async function downloadFile(url: string, filename: string) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename || 'fichier';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(blobUrl);
+  } catch {
+    window.open(url, '_blank', 'noopener');
+  }
+}
 
 function PDFViewer({ url, title, isDark }: { url: string; title: string; isDark: boolean }) {
   const [zoom, setZoom] = useState(100);
@@ -54,7 +72,10 @@ function VideoPlayer({ url, title, isDark, onProgress }: { url: string; title: s
     <div className={`rounded-2xl overflow-hidden ${isDark ? 'bg-stone-900 border border-stone-800' : 'bg-black'}`}>
       <div className={`px-4 py-2.5 flex items-center gap-2 ${isDark ? 'bg-stone-800/80' : 'bg-stone-900'}`}>
         <Video className="w-4 h-4 text-amber-400" />
-        <span className="text-sm font-medium text-stone-200 truncate">{title}</span>
+        <span className="text-sm font-medium text-stone-200 truncate flex-1">{title}</span>
+        <button onClick={() => downloadFile(url, title)} className="flex items-center gap-1.5 text-xs text-stone-300 hover:text-amber-300 transition-colors flex-shrink-0">
+          <Download className="w-3.5 h-3.5" /> Télécharger
+        </button>
       </div>
       <video
         ref={videoRef}
@@ -125,6 +146,9 @@ function AudioPlayer({ url, title, isDark }: { url: string; title: string; isDar
             <span className={`text-xs ${isDark ? 'text-stone-500' : 'text-stone-400'}`}>{formatTime(duration)}</span>
           </div>
         </div>
+        <button onClick={() => downloadFile(url, title)} title="Télécharger" className={`p-2.5 rounded-xl flex-shrink-0 transition-colors ${isDark ? 'text-stone-400 hover:text-amber-400 hover:bg-stone-800' : 'text-stone-500 hover:text-amber-600 hover:bg-stone-100'}`}>
+          <Download className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
@@ -136,6 +160,11 @@ function ImageViewer({ url, title, isDark }: { url: string; title: string; isDar
     <>
       <div className={`rounded-2xl overflow-hidden border ${isDark ? 'border-stone-800' : 'border-stone-200'}`}>
         <img src={url} alt={title} className="w-full cursor-zoom-in object-cover max-h-96" onClick={() => setLightbox(true)} />
+        <div className={`flex items-center justify-end px-3 py-2 border-t ${isDark ? 'border-stone-800 bg-stone-900' : 'border-stone-200 bg-stone-50'}`}>
+          <button onClick={() => downloadFile(url, title)} className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isDark ? 'text-stone-300 hover:text-amber-300' : 'text-stone-600 hover:text-amber-600'}`}>
+            <Download className="w-3.5 h-3.5" /> Télécharger
+          </button>
+        </div>
       </div>
       {lightbox && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4" onClick={() => setLightbox(false)}>
@@ -195,6 +224,8 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
   const [newItemType, setNewItemType] = useState<'video' | 'pdf' | 'image' | 'audio' | 'text'>('video');
   const [newItemUrl, setNewItemUrl] = useState('');
   const [newItemBody, setNewItemBody] = useState('');
+  const [newItemFile, setNewItemFile] = useState<File | null>(null);
+  const [itemError, setItemError] = useState('');
   const [savingItem, setSavingItem] = useState(false);
 
   useEffect(() => { loadAll(); }, [classId]);
@@ -298,13 +329,31 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
   const addItem = async (moduleId: string) => {
     if (!newItemTitle.trim()) return;
     setSavingItem(true);
+    setItemError('');
+
+    let contentUrl = newItemUrl.trim();
+
+    // Upload du fichier si sélectionné (admin uniquement)
+    if (newItemFile && newItemType !== 'text') {
+      const ext = newItemFile.name.split('.').pop() || newItemType;
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('course-files').upload(fileName, newItemFile);
+      if (upErr) {
+        setItemError(`Échec de l'upload : ${upErr.message}`);
+        setSavingItem(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from('course-files').getPublicUrl(fileName);
+      contentUrl = urlData.publicUrl;
+    }
+
     await supabase.from('module_items').insert({
       module_id: moduleId, class_id: classId,
       title: newItemTitle.trim(), item_type: newItemType,
-      content_url: newItemUrl.trim(), content_body: newItemBody.trim(),
+      content_url: contentUrl, content_body: newItemBody.trim(),
       order_index: (modules.find(m => m.id === moduleId)?.items?.length ?? 0),
     });
-    setShowAddItem(null); setNewItemTitle(''); setNewItemUrl(''); setNewItemBody('');
+    setShowAddItem(null); setNewItemTitle(''); setNewItemUrl(''); setNewItemBody(''); setNewItemFile(null); setItemError('');
     setSavingItem(false);
     await loadAll();
   };
@@ -491,7 +540,7 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
                               );
                             })}
                             {isAdmin && (
-                              <button onClick={() => { setShowAddItem(mod.id); setNewItemTitle(''); setNewItemUrl(''); setNewItemBody(''); setNewItemType('video'); }} className={`w-full flex items-center gap-2 pl-9 pr-3 py-2 text-xs transition-colors ${isDark ? 'text-amber-500/70 hover:text-amber-400' : 'text-amber-600/70 hover:text-amber-600'}`}>
+                              <button onClick={() => { setShowAddItem(mod.id); setNewItemTitle(''); setNewItemUrl(''); setNewItemBody(''); setNewItemFile(null); setItemError(''); setNewItemType('video'); }} className={`w-full flex items-center gap-2 pl-9 pr-3 py-2 text-xs transition-colors ${isDark ? 'text-amber-500/70 hover:text-amber-400' : 'text-amber-600/70 hover:text-amber-600'}`}>
                                 <Plus className="w-3 h-3" /> Ajouter un contenu
                               </button>
                             )}
@@ -863,9 +912,29 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
               </div>
               <input type="text" value={newItemTitle} onChange={e => setNewItemTitle(e.target.value)} placeholder="Titre du contenu" className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${isDark ? 'bg-stone-800 border-stone-700 text-stone-100 placeholder-stone-600' : 'bg-stone-50 border-stone-300 text-stone-900 placeholder-stone-400'}`} />
               {newItemType !== 'text' && (
-                <input type="text" value={newItemUrl} onChange={e => setNewItemUrl(e.target.value)} placeholder={`URL du ${newItemType}`} className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${isDark ? 'bg-stone-800 border-stone-700 text-stone-100 placeholder-stone-600' : 'bg-stone-50 border-stone-300 text-stone-900 placeholder-stone-400'}`} />
+                <>
+                  <input type="text" value={newItemUrl} onChange={e => { setNewItemUrl(e.target.value); if (e.target.value) setNewItemFile(null); }} placeholder={`URL du ${newItemType} (ou téléversez un fichier ci-dessous)`} className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${isDark ? 'bg-stone-800 border-stone-700 text-stone-100 placeholder-stone-600' : 'bg-stone-50 border-stone-300 text-stone-900 placeholder-stone-400'}`} />
+                  <div>
+                    <label className={`block text-xs font-medium mb-1.5 ${isDark ? 'text-stone-400' : 'text-stone-600'}`}>
+                      <Upload className="w-3 h-3 inline mr-1" />
+                      Téléverser un fichier (max 50 Mo)
+                    </label>
+                    <input
+                      type="file"
+                      onChange={e => { const f = e.target.files?.[0] ?? null; setNewItemFile(f); if (f) setNewItemUrl(''); }}
+                      accept={newItemType === 'video' ? 'video/*' : newItemType === 'pdf' ? 'application/pdf' : newItemType === 'image' ? 'image/*' : newItemType === 'audio' ? 'audio/*' : undefined}
+                      className={`w-full text-sm ${isDark ? 'text-stone-300 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-500/20 file:px-3 file:py-2 file:text-amber-300' : 'text-stone-600 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-100 file:px-3 file:py-2 file:text-amber-700'}`}
+                    />
+                    {newItemFile && (
+                      <p className={`text-xs mt-1 flex items-center gap-1 ${isDark ? 'text-green-400' : 'text-green-600'}`}>
+                        <CheckCircle className="w-3 h-3" /> {newItemFile.name} ({(newItemFile.size / 1024 / 1024).toFixed(2)} Mo)
+                      </p>
+                    )}
+                  </div>
+                </>
               )}
               <textarea value={newItemBody} onChange={e => setNewItemBody(e.target.value)} placeholder={newItemType === 'text' ? 'Contenu textuel...' : 'Description (optionnel)'} rows={3} className={`w-full px-3 py-2.5 rounded-xl border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${isDark ? 'bg-stone-800 border-stone-700 text-stone-100 placeholder-stone-600' : 'bg-stone-50 border-stone-300 text-stone-900 placeholder-stone-400'}`} />
+              {itemError && <p className="text-red-400 text-xs">{itemError}</p>}
             </div>
             <div className="flex gap-3 mt-5">
               <button onClick={() => setShowAddItem(null)} className={`flex-1 py-2.5 rounded-xl border text-sm font-semibold ${isDark ? 'border-stone-700 text-stone-400' : 'border-stone-300 text-stone-500'}`}>Annuler</button>

@@ -445,7 +445,7 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
 
               {/* Hero */}
               <div className={`relative rounded-3xl overflow-hidden p-8 ${isDark ? 'bg-stone-900' : 'bg-white'} border ${isDark ? 'border-stone-800' : 'border-stone-200'}`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/15 to-transparent pointer-events-none" />
                 <div className="absolute top-0 right-0 w-48 h-48 opacity-5 pointer-events-none">
                   <KongoSymbol size={192} className="text-amber-500" />
                 </div>
