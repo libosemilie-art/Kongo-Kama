@@ -281,6 +281,5 @@ CREATE POLICY "Admin can update forum messages"
 INSERT INTO courses (title, slug, description, division, is_free, is_restricted, order_index) VALUES
   ('Kikongo kia me ntêle (Kilari)', 'kikongo-kilari', 'Cours de Kikongo niveau débutant — la voie de la compréhension de base.', 'kinkimba', false, false, 1),
   ('Kikongo kia mono (Kikongo kia kati)', 'kikongo-kati', 'Cours de Kikongo intermédiaire — approfondissement de la langue sacrée.', 'kinkimba', false, false, 2),
-  ('Nzila Kongo — Spiritualité', 'nzila-kongo-spiritualite', 'Initiation à la spiritualité Kongo, enseignements ancestraux.', 'nzila_kongo', true, false, 3),
-  ('Nzila Kongo — Accès Restreint', 'nzila-kongo-restreint', 'Enseignements initiatiques profonds — accès par code spécial uniquement.', 'nzila_kongo', true, true, 4)
+  ('Nzila Kongo — Spiritualité', 'nzila-kongo-spiritualite', 'Initiation à la spiritualité Kongo, enseignements ancestraux.', 'nzila_kongo', true, false, 3)
 ON CONFLICT (slug) DO NOTHING;
