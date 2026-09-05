@@ -28,7 +28,7 @@ function FullPageLoader() {
 
 function AppContent() {
   const { user, profile, loading, profileLoading, recovery } = useAuth();
-  const [page, setPage] = useState<Page>('home');
+  const [page, setPage] = useState<Page>(recovery ? 'reset' : 'home');
   const [classId, setClassId] = useState<string>('');
 
   const navigate = (target: Page) => {

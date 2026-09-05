@@ -25,7 +25,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [recovery, setRecovery] = useState(false);
+  // Détecte immédiatement le lien de réinitialisation (#type=recovery dans l'URL)
+  // pour éviter la course avec l'événement PASSWORD_RECOVERY de supabase-js.
+  const [recovery, setRecovery] = useState<boolean>(() =>
+    typeof window !== 'undefined' && window.location.hash.includes('type=recovery'),
+  );
 
   const fetchProfile = async (userId: string, userEmail?: string, userMeta?: Record<string, unknown>, retryCount = 0) => {
     setProfileLoading(true);
@@ -103,7 +107,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setRecovery(event === 'PASSWORD_RECOVERY');
+        if (event === 'PASSWORD_RECOVERY') {
+          setRecovery(true);
+        } else if (event === 'SIGNED_OUT') {
+          setRecovery(false);
+        }
         if (session?.user) {
           (async () => { await fetchProfile(session.user.id, session.user.email, session.user.user_metadata); })();
         } else {
