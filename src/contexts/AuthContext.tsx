@@ -191,8 +191,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updatePassword = async (password: string) => {
     try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) return { error };
+      const { data, error } = await supabase.auth.updateUser({ password });
+      if (error) {
+        console.error('[updatePassword] updateUser error:', error.message);
+        return { error };
+      }
+      console.log('[updatePassword] success, user id:', data?.user?.id);
       // Clear the recovery session so the user signs in fresh with the new password
       await supabase.auth.signOut();
       setRecovery(false);
