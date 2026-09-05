@@ -202,7 +202,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await supabase.auth.signOut();
       setProfile(null);
-      setProfileLoading(true);
+      setProfileLoading(false);
       setRecovery(false);
     } catch (err) {
       console.error('Sign out error:', err);
