@@ -846,9 +846,12 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                             <h4 className={`font-bold text-sm mb-1 ${isDark ? 'text-stone-100' : 'text-stone-800'}`}>{course.title}</h4>
                             <p className={`text-xs leading-relaxed ${isDark ? 'text-stone-500' : 'text-stone-400'}`}>{course.description}</p>
                             <div className="flex items-center gap-2 mt-2 flex-wrap">
-                              {course.is_free && <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 font-medium">Gratuit</span>}
+                              {course.is_free ? (
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 font-medium">Gratuit</span>
+                              ) : (
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-medium">Payant</span>
+                              )}
                               {course.is_restricted && <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-medium">Code requis</span>}
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-medium">Approbation professeur</span>
                             </div>
                           </div>
                         </div>
@@ -859,14 +862,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                               <button onClick={() => onNavigate(`class:${existing.class_id}`)} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500/20 text-xs font-semibold transition-colors">
                                 <Play className="w-3.5 h-3.5" /> Accéder au cours
                               </button>
-                            ) : existing.payment_status === 'awaiting_approval' ? (
-                              <div className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-medium ${isDark ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
-                                <Clock className="w-3.5 h-3.5" /> Demande envoyée — en attente du professeur
+                            ) : existing.payment_status === 'pending' ? (
+                              <button onClick={() => { setSelectedEnrollmentId(existing.id); setPaymentResult('idle'); setShowPaymentModal(true); }} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-semibold transition-colors">
+                                <Clock className="w-3.5 h-3.5" /> Payer maintenant
+                              </button>
+                            ) : existing.payment_status === 'submitted' ? (
+                              <div className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-medium ${isDark ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
+                                <Clock className="w-3.5 h-3.5" /> Paiement en attente de validation
                               </div>
                             ) : existing.payment_status === 'rejected' ? (
-                              <div className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-medium ${isDark ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-600'}`}>
-                                <XCircle className="w-3.5 h-3.5" /> Demande refusée
-                              </div>
+                              <button onClick={() => { setSelectedEnrollmentId(existing.id); setPaymentResult('idle'); setShowPaymentModal(true); }} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-colors">
+                                <XCircle className="w-3.5 h-3.5" /> Paiement refusé — Réessayer
+                              </button>
                             ) : (
                               <div className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-medium ${isDark ? 'text-stone-500' : 'text-stone-400'}`}>
                                 <Clock className="w-3.5 h-3.5" /> En cours de traitement
@@ -883,7 +890,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                                 : isDark ? 'bg-stone-800 text-stone-600 cursor-not-allowed' : 'bg-stone-100 text-stone-400 cursor-not-allowed'
                             }`}
                           >
-                            {hasClass ? <><Flame className="w-3.5 h-3.5" /> Demander l'accès</> : 'Aucune classe disponible'}
+                            {hasClass ? <><Flame className="w-3.5 h-3.5" /> S'inscrire</> : 'Aucune classe disponible'}
                           </button>
                         )}
                       </div>

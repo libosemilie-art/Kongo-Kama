@@ -2,8 +2,8 @@
 -- Add requires_approval flag to courses
 ALTER TABLE courses ADD COLUMN IF NOT EXISTS requires_approval boolean NOT NULL DEFAULT false;
 
--- Update Nzila Kongo courses: no longer free, requires approval
-UPDATE courses SET is_free = false, requires_approval = true
+-- Update Nzila Kongo courses: paid, accessible via payment + admin validation
+UPDATE courses SET is_free = false, requires_approval = false
 WHERE division = 'nzila_kongo';
 
 -- Allow awaiting_approval in the check constraint on class_enrollments
