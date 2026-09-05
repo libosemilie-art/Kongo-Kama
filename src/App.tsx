@@ -95,19 +95,22 @@ function AppContent() {
     );
   }
 
-  // Guard protected pages without calling setState during render
+  // Utilisateur non connecté sur une page protégée → afficher la connexion (jamais un écran vide)
+  if (!user && (page === 'dashboard' || page === 'admin' || page === 'class')) {
+    return <AuthPage key="login" mode="login" onNavigate={navigate} />;
+  }
+
   if (page === 'dashboard') {
-    if (!user) return null;
     return <Dashboard onNavigate={navigate} />;
   }
 
   if (page === 'admin') {
-    if (!user || profile?.role !== 'admin') return null;
+    // Étudiant sur l'admin → bref chargement, l'effet le redirige vers son espace
+    if (profile?.role !== 'admin') return <FullPageLoader />;
     return <AdminPanel onNavigate={navigate} />;
   }
 
   if (page === 'class') {
-    if (!user) return null;
     return <ClassPage classId={classId} onNavigate={navigate} />;
   }
 

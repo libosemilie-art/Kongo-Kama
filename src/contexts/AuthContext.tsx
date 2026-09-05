@@ -213,12 +213,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      setProfile(null);
-      setProfileLoading(false);
-      setRecovery(false);
     } catch (err) {
       console.error('Sign out error:', err);
     }
+    // Toujours nettoyer l'état local, même si l'appel Supabase échoue
+    setProfile(null);
+    setProfileLoading(false);
+    setRecovery(false);
+    setUser(null);
+    setSession(null);
+    setLoading(false);
   };
 
   return (
