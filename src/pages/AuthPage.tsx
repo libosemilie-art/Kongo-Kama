@@ -77,7 +77,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
             setError('Inscription impossible pour le moment. Vérifiez votre connexion puis réessayez.');
           }
         } else {
-          setSuccess('Compte créé. Vérifiez votre adresse email pour confirmer votre inscription, puis connectez-vous.');
+          setSuccess('Compte créé avec succès ! Vous allez être redirigé vers votre espace.');
         }
       } else if (view === 'forgot') {
         const { error } = await resetPassword(email);
