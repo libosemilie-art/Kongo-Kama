@@ -99,9 +99,9 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
         }
         const { error } = await updatePassword(password);
         if (error) {
-          setError('Impossible de modifier le mot de passe. Le lien a peut-être expiré — redemandez un nouveau lien.');
+          setError('Ce lien de réinitialisation a déjà été utilisé ou a expiré. Demandez un nouveau lien via « Mot de passe oublié ».');
         } else {
-          setSuccess('Mot de passe modifié avec succès. Vous pouvez maintenant vous connecter.');
+          setSuccess('Mot de passe modifié avec succès ! Vous pouvez maintenant vous connecter.');
         }
       }
     } finally {
