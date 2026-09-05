@@ -45,7 +45,7 @@ function PDFViewer({ url, title, isDark }: { url: string; title: string; isDark:
           <button onClick={() => setZoom(z => Math.min(200, z + 25))} className={`p-1.5 rounded-lg transition-colors ${isDark ? 'text-stone-400 hover:bg-stone-800' : 'text-stone-500 hover:bg-stone-100'}`}><ZoomIn className="w-4 h-4" /></button>
           <div className={`w-px h-4 ${isDark ? 'bg-stone-700' : 'bg-stone-300'}`} />
           <button onClick={() => setFullscreen(f => !f)} className={`p-1.5 rounded-lg transition-colors ${isDark ? 'text-stone-400 hover:bg-stone-800' : 'text-stone-500 hover:bg-stone-100'}`}><Maximize2 className="w-4 h-4" /></button>
-          <a href={url} download target="_blank" rel="noopener noreferrer" className={`p-1.5 rounded-lg transition-colors ${isDark ? 'text-stone-400 hover:bg-stone-800' : 'text-stone-500 hover:bg-stone-100'}`}><Download className="w-4 h-4" /></a>
+          <button onClick={() => downloadFile(url, title)} title="Télécharger" className={`p-1.5 rounded-lg transition-colors ${isDark ? 'text-stone-400 hover:bg-stone-800' : 'text-stone-500 hover:bg-stone-100'}`}><Download className="w-4 h-4" /></button>
           {fullscreen && <button onClick={() => setFullscreen(false)} className={`p-1.5 rounded-lg ${isDark ? 'text-stone-400 hover:bg-stone-800' : 'text-stone-500 hover:bg-stone-100'}`}><X className="w-4 h-4" /></button>}
         </div>
       </div>
@@ -335,6 +335,11 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
 
     // Upload du fichier si sélectionné (admin uniquement)
     if (newItemFile && newItemType !== 'text') {
+      if (newItemFile.size > 50 * 1024 * 1024) {
+        setItemError('Le fichier est trop volumineux (maximum 50 Mo).');
+        setSavingItem(false);
+        return;
+      }
       const ext = newItemFile.name.split('.').pop() || newItemType;
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const { error: upErr } = await supabase.storage.from('course-files').upload(fileName, newItemFile);
@@ -921,7 +926,7 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
                     </label>
                     <input
                       type="file"
-                      onChange={e => { const f = e.target.files?.[0] ?? null; setNewItemFile(f); if (f) setNewItemUrl(''); }}
+                      onChange={e => { const f = e.target.files?.[0] ?? null; if (f && f.size > 50 * 1024 * 1024) { setItemError('Le fichier est trop volumineux (maximum 50 Mo).'); setNewItemFile(null); e.target.value = ''; } else { setItemError(''); setNewItemFile(f); if (f) setNewItemUrl(''); } }}
                       accept={newItemType === 'video' ? 'video/*' : newItemType === 'pdf' ? 'application/pdf' : newItemType === 'image' ? 'image/*' : newItemType === 'audio' ? 'audio/*' : undefined}
                       className={`w-full text-sm ${isDark ? 'text-stone-300 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-500/20 file:px-3 file:py-2 file:text-amber-300' : 'text-stone-600 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-100 file:px-3 file:py-2 file:text-amber-700'}`}
                     />
