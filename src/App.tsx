@@ -1,20 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import AuthPage from './pages/AuthPage';
-import Dashboard from './pages/Dashboard';
-import AdminPanel from './pages/AdminPanel';
-import ClassPage from './pages/ClassPage';
-import DigitalStore from './pages/DigitalStore';
 import LegalMentions from './pages/LegalMentions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 
+// Lazy-loaded pages (heavy, chargées à la demande pour un premier affichage plus rapide)
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const AdminPanel = lazy(() => import('./pages/AdminPanel'));
+const ClassPage = lazy(() => import('./pages/ClassPage'));
+const DigitalStore = lazy(() => import('./pages/DigitalStore'));
+
 type Page = string;
 
+function FullPageLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-stone-950">
+      <div className="text-center">
+        <div className="w-10 h-10 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-stone-500 text-sm">Chargement...</p>
+      </div>
+    </div>
+  );
+}
+
 function AppContent() {
-  const { user, profile, loading, profileLoading } = useAuth();
+  const { user, profile, loading, profileLoading, recovery } = useAuth();
   const [page, setPage] = useState<Page>('home');
   const [classId, setClassId] = useState<string>('');
 
@@ -40,6 +53,12 @@ function AppContent() {
   useEffect(() => {
     if (loading || profileLoading) return;
 
+    // Password recovery flow → force the reset-password screen
+    if (recovery) {
+      setPage('reset');
+      return;
+    }
+
     // Authenticated user on landing/auth pages → redirect to their space
     if (user && (page === 'login' || page === 'register' || page === 'home')) {
       setPage(profile?.role === 'admin' ? 'admin' : 'dashboard');
@@ -63,7 +82,7 @@ function AppContent() {
       setPage('login');
       return;
     }
-  }, [user, profile, loading, profileLoading, page]);
+  }, [user, profile, loading, profileLoading, page, recovery]);
 
   if (loading || (user && profileLoading)) {
     return (
@@ -92,8 +111,8 @@ function AppContent() {
     return <ClassPage classId={classId} onNavigate={navigate} />;
   }
 
-  if (page === 'login' || page === 'register') {
-    return <AuthPage mode={page} onNavigate={navigate} />;
+  if (page === 'login' || page === 'register' || page === 'reset') {
+    return <AuthPage key={page} mode={page} onNavigate={navigate} />;
   }
 
   if (page === 'store') {
@@ -135,7 +154,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppContent />
+        <Suspense fallback={<FullPageLoader />}>
+          <AppContent />
+        </Suspense>
       </AuthProvider>
     </ThemeProvider>
   );

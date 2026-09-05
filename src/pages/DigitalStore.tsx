@@ -139,8 +139,8 @@ export default function DigitalStore({ onNavigate, initialCategory = 'all' }: Di
             Boutique Digitale
           </div>
 
-          <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-4 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
-            Œuvres <span className="text-amber-500">Digitales</span>
+          <h1 className={`font-display text-5xl sm:text-6xl md:text-7xl font-semibold leading-tight mb-4 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
+            Œuvres <span className="text-gold">Digitales</span>
           </h1>
           <p className={`text-base sm:text-lg max-w-2xl mx-auto mb-8 ${isDark ? 'text-stone-400' : 'text-stone-500'}`}>
             Conférences, cours et livres numériques pour approfondir votre connaissance de la Kongologie et de la spiritualité Kongo.
@@ -279,7 +279,7 @@ export default function DigitalStore({ onNavigate, initialCategory = 'all' }: Di
       <section className={`py-16 px-4 ${isDark ? 'bg-stone-900/50' : 'bg-white'}`}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className={`text-2xl sm:text-3xl font-bold mb-3 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
+            <h2 className={`font-display text-3xl sm:text-4xl font-semibold mb-3 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
               Comment ça marche ?
             </h2>
             <p className={`text-sm ${isDark ? 'text-stone-400' : 'text-stone-500'}`}>
@@ -325,8 +325,8 @@ export default function DigitalStore({ onNavigate, initialCategory = 'all' }: Di
       <section className={`py-16 px-4 ${isDark ? 'bg-stone-900/40' : 'bg-amber-50'}`}>
         <div className="max-w-3xl mx-auto text-center">
           <KongoSymbol size={40} className="text-amber-500 mx-auto mb-6" />
-          <h2 className={`text-2xl sm:text-3xl font-bold mb-3 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
-            Envie d'aller plus loin ?
+          <h2 className={`font-display text-3xl sm:text-4xl font-semibold mb-3 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
+            Envie d'aller <span className="text-gold">plus loin</span> ?
           </h2>
           <p className={`text-sm mb-6 ${isDark ? 'text-stone-400' : 'text-stone-500'}`}>
             Inscrivez-vous à l'école Kongo Kama pour accéder aux cours complets, aux forums et à la communauté.

@@ -275,8 +275,8 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
           <div className={`flex items-center gap-3 px-5 h-16 border-b ${isDark ? 'border-stone-800' : 'border-stone-100'}`}>
             <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-8 h-8 rounded-xl object-cover" />
             <div>
-              <span className={`font-bold text-sm ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
-                Kongo<span className="text-amber-500">Kama</span>
+              <span className={`font-display font-semibold text-base ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
+                Kongo<span className="text-gold">Kama</span>
               </span>
               <div className="text-xs text-amber-500/70 font-medium">Administrateur</div>
             </div>
@@ -451,8 +451,8 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
                 </div>
                 <div className="relative z-10">
                   <p className={`text-xs font-semibold uppercase tracking-widest mb-2 text-amber-500`}>Tableau de bord</p>
-                  <h2 className={`text-2xl sm:text-3xl font-bold mb-2 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
-                    Bienvenue, <span className="text-amber-500">{profile?.full_name?.split(' ')[0]}</span>
+                  <h2 className={`font-display text-3xl sm:text-4xl font-semibold mb-2 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
+                    Bienvenue, <span className="text-gold">{profile?.full_name?.split(' ')[0]}</span>
                   </h2>
                   <p className={`text-sm ${isDark ? 'text-stone-400' : 'text-stone-500'}`}>
                     Gerez vos classes, validez les paiements et suivez la progression de vos etudiants.

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, Sun, Moon, BookOpen } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,6 +12,14 @@ export default function Navbar({ onNavigate, currentPage }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const { user, profile, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const navLinks = [
     { label: 'Accueil', page: 'home' },
@@ -31,14 +39,14 @@ export default function Navbar({ onNavigate, currentPage }: NavbarProps) {
       theme === 'dark'
         ? 'bg-stone-950/90 border-b border-amber-900/20'
         : 'bg-white/90 border-b border-amber-200/40'
-    } backdrop-blur-xl`}>
+    } ${scrolled ? 'shadow-lg shadow-black/5' : ''} backdrop-blur-xl`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <button onClick={() => handleNav('home')} className="flex items-center gap-2.5 group">
-            <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-8 h-8 rounded-lg object-cover" />
-            <span className={`font-bold text-lg tracking-tight ${theme === 'dark' ? 'text-amber-50' : 'text-stone-900'}`}>
-              Kongo<span className="text-amber-500">Kama</span>
+            <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-8 h-8 rounded-lg object-cover transition-transform duration-300 group-hover:scale-105" />
+            <span className={`font-display font-semibold text-xl tracking-tight ${theme === 'dark' ? 'text-amber-50' : 'text-stone-900'}`}>
+              Kongo<span className="text-gold">Kama</span>
             </span>
           </button>
 
@@ -48,13 +56,16 @@ export default function Navbar({ onNavigate, currentPage }: NavbarProps) {
               <button
                 key={link.page}
                 onClick={() => handleNav(link.page)}
-                className={`text-sm font-medium transition-colors hover:text-amber-500 ${
+                className={`relative text-sm font-medium transition-colors hover:text-amber-500 group ${
                   currentPage === link.page
                     ? 'text-amber-500'
                     : theme === 'dark' ? 'text-stone-300' : 'text-stone-600'
                 }`}
               >
                 {link.label}
+                <span className={`absolute -bottom-1.5 left-0 h-px w-full origin-left bg-gradient-to-r from-amber-400 to-amber-600 transition-transform duration-300 ${
+                  currentPage === link.page ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                }`} />
               </button>
             ))}
           </div>
@@ -106,7 +117,7 @@ export default function Navbar({ onNavigate, currentPage }: NavbarProps) {
                 </button>
                 <button
                   onClick={() => handleNav('register')}
-                  className="text-sm font-semibold px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-white transition-colors shadow-lg shadow-amber-900/30"
+                  className="btn-gold text-sm font-semibold px-4 py-2 rounded-lg shadow-lg shadow-amber-900/30"
                 >
                   S'inscrire
                 </button>
@@ -154,7 +165,7 @@ export default function Navbar({ onNavigate, currentPage }: NavbarProps) {
                 <button onClick={() => handleNav('login')} className={`text-sm font-medium py-2 text-left ${theme === 'dark' ? 'text-stone-300' : 'text-stone-600'}`}>
                   Connexion
                 </button>
-                <button onClick={() => handleNav('register')} className="text-sm font-semibold py-2 px-4 rounded-lg bg-amber-500 text-white text-center">
+                <button onClick={() => handleNav('register')} className="btn-gold text-sm font-semibold py-2 px-4 rounded-lg text-center">
                   S'inscrire
                 </button>
               </>

@@ -11,8 +11,8 @@ export default function PrivacyPolicy({ onNavigate }: PrivacyPageProps) {
   return (
     <div className={`min-h-screen pt-24 pb-16 px-4 ${isDark ? 'bg-stone-950 text-stone-100' : 'bg-stone-50 text-stone-900'}`}>
       <div className="max-w-4xl mx-auto">
-        <h1 className={`text-4xl font-bold mb-8 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
-          Politique de Confidentialité
+        <h1 className={`font-display text-4xl sm:text-5xl font-semibold mb-8 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
+          Politique de <span className="text-gold">Confidentialité</span>
         </h1>
 
         <div className={`prose prose-lg max-w-none ${isDark ? 'prose-invert' : ''}`}>

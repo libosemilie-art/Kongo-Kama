@@ -287,8 +287,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           {/* Logo */}
           <div className={`flex items-center gap-3 px-5 h-16 border-b ${isDark ? 'border-stone-800' : 'border-stone-100'}`}>
             <img src="/kongo-kama-logo.png" alt="KongoKama" className="w-8 h-8 rounded-xl object-cover" />
-            <span className={`font-bold text-base ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
-              Kongo<span className="text-amber-500">Kama</span>
+            <span className={`font-display font-semibold text-lg ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
+              Kongo<span className="text-gold">Kama</span>
             </span>
           </div>
 
@@ -349,7 +349,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <div className={`p-4 border-t space-y-2 ${isDark ? 'border-stone-800' : 'border-stone-100'}`}>
             <button
               onClick={() => { setShowAccessModal(true); setAccessResult('idle'); setAccessCode(''); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold transition-colors"
+              className="btn-gold w-full px-3 py-2.5 rounded-xl text-sm shadow-md shadow-amber-900/20"
             >
               <Key className="w-4 h-4" />
               Entrer un code
@@ -464,8 +464,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                       <p className={`text-xs font-semibold uppercase tracking-widest mb-2 ${isDark ? 'text-amber-500/70' : 'text-amber-500'}`}>
                         Bienvenue sur KongoKama
                       </p>
-                      <h2 className={`text-2xl sm:text-3xl font-bold mb-3 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
-                        {greeting}, <span className="text-amber-500">{firstName}</span>
+                      <h2 className={`font-display text-3xl sm:text-4xl font-semibold mb-3 ${isDark ? 'text-amber-50' : 'text-stone-900'}`}>
+                        {greeting}, <span className="text-gold">{firstName}</span>
                       </h2>
                       <p className={`text-sm leading-relaxed max-w-md ${isDark ? 'text-stone-400' : 'text-stone-500'}`}>
                         Votre espace d'eveil et d'apprentissage Kongo Kama. Explorez les cours, rejoignez vos classes et participez aux forums.

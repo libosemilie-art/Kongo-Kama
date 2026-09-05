@@ -22,7 +22,6 @@ Deno.serve(async (req: Request) => {
     const adminEmail = "kongokama0@gmail.com";
     const adminPassword = Deno.env.get("ADMIN_PASSWORD");
     const adminFullName = "Mbuta Sita Toma";
-    const adminId = "f858eb72-b295-4981-8611-6113e5701047";
 
     if (!adminPassword) {
       return new Response(JSON.stringify({ error: "ADMIN_PASSWORD secret is not configured" }), {
@@ -31,19 +30,22 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Update the existing admin user's password
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-      adminId,
-      {
+    // Resolve the admin user by email (no fragile hardcoded UUID)
+    let userId: string | null = null;
+    const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    if (!listError && listData?.users) {
+      const found = listData.users.find((u) => u.email === adminEmail);
+      userId = found?.id ?? null;
+    }
+
+    if (userId) {
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
         password: adminPassword,
         email_confirm: true,
         user_metadata: { full_name: adminFullName },
-      }
-    );
-
-    if (updateError) {
-      // If user doesn't exist, create them
-      const { data: createData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+      });
+    } else {
+      const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: adminEmail,
         password: adminPassword,
         email_confirm: true,
@@ -56,23 +58,23 @@ Deno.serve(async (req: Request) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      userId = created.user?.id ?? null;
+    }
 
-      // Ensure profile has admin role
-      await supabaseAdmin.from("profiles").upsert({
-        id: createData.user?.id,
-        email: adminEmail,
-        full_name: adminFullName,
-        role: "admin",
-      });
-    } else {
-      // Ensure profile has admin role
-      await supabaseAdmin.from("profiles").upsert({
-        id: adminId,
-        email: adminEmail,
-        full_name: adminFullName,
-        role: "admin",
+    if (!userId) {
+      return new Response(JSON.stringify({ error: "Unable to resolve admin user id" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Ensure the profile has the admin role
+    await supabaseAdmin.from("profiles").upsert({
+      id: userId,
+      email: adminEmail,
+      full_name: adminFullName,
+      role: "admin",
+    });
 
     return new Response(JSON.stringify({
       success: true,

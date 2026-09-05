@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, BookOpen, FileText, Image, Video, CheckCircle, MessageCircle, Send, Flame, Download, Plus, Trash2, Music, Type, ChevronDown, Users, Pin, Reply, X, ZoomIn, ZoomOut, Maximize2, Play, Pause, Hash } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, Image, Video, CheckCircle, MessageCircle, Send, Flame, Download, Plus, Trash2, Music, Type, ChevronDown, Users, Pin, Reply, X, ZoomIn, ZoomOut, Maximize2, Play, Pause, Hash, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, Module, ModuleItem, ItemProgress, ForumMessage } from '../lib/supabase';
@@ -160,7 +160,7 @@ function ItemIcon({ type, className = '' }: { type: string; className?: string }
 // ── Main ClassPage ─────────────────────────────────────────────────────────────
 
 export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const { profile } = useAuth();
   const isDark = theme === 'dark';
   const isAdmin = profile?.role === 'admin';
@@ -398,6 +398,17 @@ export default function ClassPage({ classId, onNavigate }: ClassPageProps) {
               <span className="text-xs text-amber-500 font-semibold">{progressPct}%</span>
             </div>
           )}
+
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            aria-label="Changer de theme"
+            className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
+              isDark ? 'text-stone-400 hover:text-amber-400 hover:bg-stone-800' : 'text-stone-500 hover:text-amber-600 hover:bg-stone-100'
+            }`}
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
 
           {/* View tabs */}
           <div className={`flex gap-0.5 p-0.5 rounded-xl ${isDark ? 'bg-stone-900' : 'bg-stone-100'}`}>

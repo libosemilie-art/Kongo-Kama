@@ -12,6 +12,9 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: Error | null }>;
+  updatePassword: (password: string) => Promise<{ error: Error | null }>;
+  recovery: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [recovery, setRecovery] = useState(false);
 
   const fetchProfile = async (userId: string, userEmail?: string, userMeta?: Record<string, unknown>, retryCount = 0) => {
     setProfileLoading(true);
@@ -96,9 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       });
 
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setRecovery(event === 'PASSWORD_RECOVERY');
         if (session?.user) {
           (async () => { await fetchProfile(session.user.id, session.user.email, session.user.user_metadata); })();
         } else {
@@ -164,18 +169,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin,
+      });
+      return { error: error ?? null };
+    } catch (err) {
+      console.error('Reset password error:', err);
+      return { error: err as Error };
+    }
+  };
+
+  const updatePassword = async (password: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) return { error };
+      // Clear the recovery session so the user signs in fresh with the new password
+      await supabase.auth.signOut();
+      setRecovery(false);
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      return { error: null };
+    } catch (err) {
+      console.error('Update password error:', err);
+      return { error: err as Error };
+    }
+  };
+
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
       setProfile(null);
       setProfileLoading(true);
+      setRecovery(false);
     } catch (err) {
       console.error('Sign out error:', err);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, profileLoading, signUp, signIn, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, session, profile, loading, profileLoading, signUp, signIn, signOut, refreshProfile, resetPassword, updatePassword, recovery }}>
       {children}
     </AuthContext.Provider>
   );

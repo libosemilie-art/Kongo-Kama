@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,6 +9,7 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   html {
@@ -31,6 +32,59 @@
   input, textarea, select, button {
     font: inherit;
   }
+
+  ::selection {
+    @apply bg-amber-500/30 text-amber-950;
+  }
+
+  .dark ::selection {
+    @apply bg-amber-500/40 text-amber-50;
+  }
+}
+
+@layer components {
+  /* Gradient doré pour les titres */
+  .text-gold {
+    @apply bg-gold-text bg-clip-text text-transparent;
+    background-size: 200% auto;
+  }
+
+  /* Liseré lumineux animé pour les cartes premium */
+  .card-glow {
+    position: relative;
+  }
+  .card-glow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.5), rgba(251, 191, 36, 0) 40%, rgba(251, 191, 36, 0) 60%, rgba(251, 191, 36, 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Bouton doré avec brillance */
+  .btn-gold {
+    @apply relative inline-flex items-center justify-center gap-2 font-semibold text-white overflow-hidden;
+    background-image: linear-gradient(135deg, #fbbf24 0%, #f59e0b 45%, #d97706 100%);
+    background-size: 150% auto;
+    transition: background-position 0.5s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  }
+  .btn-gold:hover {
+    background-position: right center;
+    @apply shadow-glow;
+  }
+
+  /* Motif géométrique de fond */
+  .kongo-grid {
+    background-image:
+      linear-gradient(to right, rgba(245, 158, 11, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(245, 158, 11, 0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
 }
 
 @layer utilities {
@@ -49,4 +103,50 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  .animate-delay-100 { animation-delay: 100ms; }
+  .animate-delay-200 { animation-delay: 200ms; }
+  .animate-delay-300 { animation-delay: 300ms; }
+  .animate-delay-500 { animation-delay: 500ms; }
+  .animate-delay-700 { animation-delay: 700ms; }
+}
+
+/* ── Barre de défilement personnalisée ─────────────────────────── */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #fbbf24, #b45309);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #fcd34d, #f59e0b);
+  background-clip: padding-box;
+}
+
+/* ── Animation de révélation au scroll (composant Reveal) ───────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.reveal-left {
+  transform: translateX(-36px);
+}
+.reveal.reveal-right {
+  transform: translateX(36px);
+}
+.reveal.reveal-scale {
+  transform: scale(0.92);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
 }
